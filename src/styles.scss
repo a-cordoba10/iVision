@@ -1,0 +1,66 @@
+/* You can add global styles to this file, and also import other style files */
+//Imports
+@import './partials/variables';
+@import './partials/mixins';
+@import './partials/text';
+@import './partials/navigation';
+@import './partials/buttons';
+
+//General Style
+html,
+body,
+.body-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: $bg;
+  font-size: 100%;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 400;
+  color: $font;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: 0;
+}
+
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  @include transform(translate(-50%, -50%));
+}
+
+.margin-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+//Remove of Styles
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+button,
+input {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 1rem;
+  border: none;
+}
+
+input {
+  color: $font;
+  font-weight: 400;
+  outline: none;
+}

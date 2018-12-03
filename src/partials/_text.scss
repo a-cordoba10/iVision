@@ -1,0 +1,20 @@
+//Style of text
+.txt {
+    line-height: 1.4;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+}
+
+.light {
+    font-weight: 300;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.light-color {
+    color: $light-font;
+}

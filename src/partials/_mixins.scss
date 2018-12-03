@@ -1,0 +1,52 @@
+@mixin transform($property) {
+    -webkit-transform: $property;
+    -ms-transform: $property;
+    transform: $property;
+}
+
+@mixin flex($property: null, $align: null, $justify: null) {
+    display: flex;
+    flex-direction: $property;
+    align-items: $align;
+    justify-content: $justify;
+}
+
+@mixin transition($property) {
+    cursor: pointer;
+    transition: all $property;
+}
+
+@mixin font-size($property) {
+    font-size: ($property * 0.729) !important;
+
+    @media (min-width: 900px) {
+        font-size: ($property * 0.81) !important;
+    }
+    @media (min-width: 1200px) {
+        font-size: ($property * 0.9) !important;
+    }
+    @media (min-width: 1800px) {
+        font-size: $property !important;
+    }
+}
+
+@mixin animation($property, $duration, $loop) {
+    -webkit-animation: $property $duration linear $loop;
+    -moz-animation: $property $duration linear $loop;
+    -o-animation: $property $duration linear $loop;
+    animation: $property $duration linear $loop;
+}
+
+@mixin for-size($size) {
+  @if $size == phone-only {
+    @media (max-width: 599px) { @content; }
+  } @else if $size == tablet-portrait-up {
+    @media (min-width: 600px) { @content; }
+  } @else if $size == tablet-landscape-up {
+    @media (min-width: 900px) { @content; }
+  } @else if $size == desktop-up {
+    @media (min-width: 1200px) { @content; }
+  } @else if $size == big-desktop-up {
+    @media (min-width: 1600px) { @content; }
+  }
+}

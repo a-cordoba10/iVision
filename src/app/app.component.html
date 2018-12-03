@@ -1,0 +1,82 @@
+<div class="modal-u" [class.selected]="modalCircle">
+  <div class="modal-navbar">
+    <div class="txt bold">Información del Círculo 
+      <button class="btn-1" [class.selected]="circleTab === 0" [disabled]="circleTab === 0" (click)="toggleCircleTab(0)">USUARIOS</button> 
+      <button class="btn-1" [class.selected]="circleTab === 1" [disabled]="circleTab === 1" (click)="toggleCircleTab(1)">OBJETOS</button>
+      <button class="btn-1" [class.selected]="circleTab === 2" [disabled]="circleTab === 2" (click)="toggleCircleTab(2)">HISTORIAL</button></div>
+    <button class="btn-1" (click)="closeModal('c')">
+      <img src="../assets/cancel.svg" alt="">
+    </button>
+  </div>
+  <div class="brief">
+    <img [src]="(cCircle | async)?.imageUrl" alt="">
+    <div class="txt bold">{{(cCircle | async)?.name}}</div>
+    <div class="txt">Dirección: {{(cCircle | async)?.addrress}}</div>
+    <div class="txt light">Lat: {{(cCircle | async)?.location._lat}}, Long: {{(cCircle | async)?.location._long}}</div>
+  </div>
+  <div class="circles">
+    <ng-container *ngIf="circleTab === 0">
+        <div class="circle" *ngFor="let user of (cCircle | async)?.participants" (click)="openUser(user.objectID)">
+            {{user.name}} ({{user.phone}})
+          </div>
+    </ng-container>
+    <ng-container *ngIf="circleTab === 1">
+        <div class="circle -disabled" *ngFor="let object of cObjectsCircle | async">
+            <img [src]="object.image" alt="">  {{object.name}} - ({{object.state}})
+          </div>
+    </ng-container>
+    <ng-container *ngIf="circleTab === 2">
+        <div class="circle -disabled" *ngFor="let history of cHistoryCircle | async">
+            {{history.name}}
+          </div>
+    </ng-container>
+  </div>
+</div>
+
+<div class="modal-u" [class.selected]="modalUser">
+  <div class="modal-navbar">
+    <div class="txt bold">Información de Usuario</div>
+    <button class="btn-1" (click)="closeModal('u')">
+      <img src="../assets/cancel.svg" alt="">
+    </button>
+  </div>
+  <div class="brief">
+    <div class="txt bold">{{(cUser | async)?.name}}</div>
+    <div class="txt">{{(cUser | async)?.email}}</div>
+    <div class="txt light">{{(cUser | async)?.phone}}</div>
+  </div>
+  <div class="circles">
+    <div class="circle" *ngFor="let circle of (cUser | async)?.circles" (click)="openCircle(circle.objectID)">
+      {{circle.name}}
+    </div>
+  </div>
+</div>
+
+<div class="navbar">
+  <div class="txt bold">iVision</div>
+  <button class="btn-1" [class.selected]="userList" [disabled]="userList" (click)="toggleTab()">USUARIOS</button>
+  <button class="btn-1" [class.selected]="!userList" [disabled]="!userList" (click)="toggleTab()">CÍRCULOS</button>
+</div>
+<div class="header">
+  <div class="title">
+    <div *ngIf="userList" class="txt bold">Usuarios</div>
+    <div *ngIf="!userList" class="txt bold">Círculos</div>
+  </div>
+</div>
+<div class="list">
+  <ng-container *ngIf="userList">
+    <div class="user" *ngFor="let user of user$ | async" (click)="openUser(user.id)">
+      <img src="../assets/user.svg" alt="">
+      <div class="txt bold">{{user.name}}</div>
+      <div class="txt light-color">{{user.email}}</div>
+      <div class="txt light">{{user.phone}}</div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="!userList">
+    <div class="user" *ngFor="let circle of circle$ | async" (click)="openCircle(circle.id)">
+      <img [src]="circle.imageUrl" alt="">
+      <div class="txt bold">{{circle.name}}</div>
+      <div class="txt light-color">{{circle.addrress}}</div>
+    </div>
+  </ng-container>
+</div>

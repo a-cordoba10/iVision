@@ -1,0 +1,23 @@
+button {
+    @include flex(row, center);
+    padding: 11pt;
+    font-weight: 700;
+    border-radius: 10px;
+    @include transition(0.25s);
+}
+.btn-1 {
+    @include font-size(0.85rem);
+    background-color: $dark-mc;
+    color: $white;
+    opacity: 0.5;
+    &:hover {
+        background-color: $mc;
+        opacity: 0.8;
+    }
+    &.selected {
+        opacity: 1;
+    }
+    & > img {
+        width: 1rem;
+    }
+}
