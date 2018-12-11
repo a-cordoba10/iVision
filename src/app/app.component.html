@@ -54,17 +54,19 @@
 
 <div class="navbar">
   <div class="txt bold">iVision</div>
-  <button class="btn-1" [class.selected]="userList" [disabled]="userList" (click)="toggleTab()">USUARIOS</button>
-  <button class="btn-1" [class.selected]="!userList" [disabled]="!userList" (click)="toggleTab()">CÍRCULOS</button>
+  <button class="btn-1" [class.selected]="userList === 0" [disabled]="userList === 0" (click)="toggleTab(0)">USUARIOS</button>
+  <button class="btn-1" [class.selected]="userList === 1" [disabled]="userList === 1" (click)="toggleTab(1)">CÍRCULOS</button>
+  <button class="btn-1" [class.selected]="userList === 2" [disabled]="userList === 2" (click)="toggleTab(2)">ESTADÍSTICAS</button>
 </div>
 <div class="header">
   <div class="title">
-    <div *ngIf="userList" class="txt bold">Usuarios</div>
-    <div *ngIf="!userList" class="txt bold">Círculos</div>
+    <div *ngIf="userList === 0" class="txt bold">Usuarios</div>
+    <div *ngIf="userList === 1" class="txt bold">Círculos</div>
+    <div *ngIf="userList === 2" class="txt bold">Estadísticas</div>
   </div>
 </div>
 <div class="list">
-  <ng-container *ngIf="userList">
+  <ng-container *ngIf="userList === 0">
     <div class="user" *ngFor="let user of user$ | async" (click)="openUser(user.id)">
       <img src="../assets/user.svg" alt="">
       <div class="txt bold">{{user.name}}</div>
@@ -72,11 +74,53 @@
       <div class="txt light">{{user.phone}}</div>
     </div>
   </ng-container>
-  <ng-container *ngIf="!userList">
+  <ng-container *ngIf="userList === 1">
     <div class="user" *ngFor="let circle of circle$ | async" (click)="openCircle(circle.id)">
       <img [src]="circle.imageUrl" alt="">
       <div class="txt bold">{{circle.name}}</div>
       <div class="txt light-color">{{circle.addrress}}</div>
     </div>
+  </ng-container>
+  <ng-container *ngIf="userList === 2">
+      <div class="user">
+      <canvas baseChart
+                [datasets]="barChartData"
+                [labels]="barChartLabels"
+                [options]="barChartOptions"
+                [legend]="barChartLegend"
+                [chartType]="barChartType"
+                (chartHover)="chartHovered($event)"
+                (chartClick)="chartClicked($event)"></canvas>
+      </div>
+      <div class="user">
+        <canvas baseChart
+                  [datasets]="barChartData2"
+                  [labels]="barChartLabels2"
+                  [options]="barChartOptions"
+                  [legend]="barChartLegend"
+                  [chartType]="barChartType"
+                  (chartHover)="chartHovered($event)"
+                  (chartClick)="chartClicked($event)"></canvas>
+        </div>
+        <div class="user">
+          <canvas baseChart
+                    [datasets]="barChartData3"
+                    [labels]="barChartLabels3"
+                    [options]="barChartOptions"
+                    [legend]="barChartLegend"
+                    [chartType]="barChartType"
+                    (chartHover)="chartHovered($event)"
+                    (chartClick)="chartClicked($event)"></canvas>
+          </div>
+          <div class="user">
+            <canvas baseChart
+                      [datasets]="barChartData4"
+                      [labels]="barChartLabels4"
+                      [options]="barChartOptions"
+                      [legend]="barChartLegend"
+                      [chartType]="barChartType"
+                      (chartHover)="chartHovered($event)"
+                      (chartClick)="chartClicked($event)"></canvas>
+            </div>
   </ng-container>
 </div>
