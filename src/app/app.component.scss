@@ -26,6 +26,14 @@
     grid-row-gap: 2.5rem;
     padding: 0 5% 0 22%;
     margin-bottom: 2rem;
+    &.-big {
+        grid-template-columns: 1fr;
+        grid-column-gap: 1rem;
+        grid-row-gap: 1rem;
+        & > .user {
+            padding: 2.5%;
+        }
+    }
     & > .user {
         @include flex(column, center);
         padding: 20% 2.5%;

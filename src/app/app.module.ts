@@ -10,6 +10,7 @@ import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 
 import { ChartsModule } from 'ng2-charts';
+import { MomentModule } from 'ngx-moment';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { ChartsModule } from 'ng2-charts';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     ChartsModule,
+    MomentModule,
   ],
   providers: [AngularFirestore],
   bootstrap: [AppComponent]

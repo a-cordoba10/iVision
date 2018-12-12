@@ -1,7 +1,7 @@
 <div class="modal-u" [class.selected]="modalCircle">
   <div class="modal-navbar">
-    <div class="txt bold">Información del Círculo 
-      <button class="btn-1" [class.selected]="circleTab === 0" [disabled]="circleTab === 0" (click)="toggleCircleTab(0)">USUARIOS</button> 
+    <div class="txt bold">Información del Círculo
+      <button class="btn-1" [class.selected]="circleTab === 0" [disabled]="circleTab === 0" (click)="toggleCircleTab(0)">USUARIOS</button>
       <button class="btn-1" [class.selected]="circleTab === 1" [disabled]="circleTab === 1" (click)="toggleCircleTab(1)">OBJETOS</button>
       <button class="btn-1" [class.selected]="circleTab === 2" [disabled]="circleTab === 2" (click)="toggleCircleTab(2)">HISTORIAL</button></div>
     <button class="btn-1" (click)="closeModal('c')">
@@ -16,19 +16,19 @@
   </div>
   <div class="circles">
     <ng-container *ngIf="circleTab === 0">
-        <div class="circle" *ngFor="let user of (cCircle | async)?.participants" (click)="openUser(user.objectID)">
-            {{user.name}} ({{user.phone}})
-          </div>
+      <div class="circle" *ngFor="let user of (cCircle | async)?.participants" (click)="openUser(user.objectID)">
+        {{user.name}} ({{user.phone}})
+      </div>
     </ng-container>
     <ng-container *ngIf="circleTab === 1">
-        <div class="circle -disabled" *ngFor="let object of cObjectsCircle | async">
-            <img [src]="object.image" alt="">  {{object.name}} - ({{object.state}})
-          </div>
+      <div class="circle -disabled" *ngFor="let object of cObjectsCircle | async">
+        <img [src]="object.image" alt=""> {{object.name}} - ({{object.state}})
+      </div>
     </ng-container>
     <ng-container *ngIf="circleTab === 2">
-        <div class="circle -disabled" *ngFor="let history of cHistoryCircle | async">
-            {{history.name}}
-          </div>
+      <div class="circle -disabled" *ngFor="let history of cHistoryCircle | async">
+        {{history.name}}
+      </div>
     </ng-container>
   </div>
 </div>
@@ -65,7 +65,7 @@
     <div *ngIf="userList === 2" class="txt bold">Estadísticas</div>
   </div>
 </div>
-<div class="list">
+<div class="list" [class.-big]="userList === 2">
   <ng-container *ngIf="userList === 0">
     <div class="user" *ngFor="let user of user$ | async" (click)="openUser(user.id)">
       <img src="../assets/user.svg" alt="">
@@ -82,45 +82,136 @@
     </div>
   </ng-container>
   <ng-container *ngIf="userList === 2">
-      <div class="user">
-      <canvas baseChart
-                [datasets]="barChartData"
-                [labels]="barChartLabels"
-                [options]="barChartOptions"
-                [legend]="barChartLegend"
-                [chartType]="barChartType"
-                (chartHover)="chartHovered($event)"
-                (chartClick)="chartClicked($event)"></canvas>
+    <div class="user">
+      <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend"
+        [chartType]="barChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+      <div class="txt light-color">En esta gráfica se muestran cuantos usuarios tienen una determinada cantidad de
+        círculos, esto nos permite conocer el nivel de riqueza entre las personas que usan la aplicación</div>
+
+    </div>
+    <div class="user">
+      <canvas baseChart [datasets]="barChartData2" [labels]="barChartLabels2" [options]="barChartOptions" [legend]="barChartLegend"
+        [chartType]="barChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+      <div class="txt light-color">En esta gráfica se muestran cuantos círculos tienen una determinada cantidad de
+        usuarios, esto nos permite obervar el tamaño promedio de las familias que usan la aplicación</div>
+
+    </div>
+    <div class="user">
+      <canvas baseChart [datasets]="barChartData3" [labels]="barChartLabels3" [options]="barChartOptions" [legend]="barChartLegend"
+        [chartType]="barChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+      <div class="txt light-color">En esta gráfica se muestran cuantos objetos tiene un determinado círculo,esto nos
+        permite conocer el nivel de riqueza entre las personas que usan la aplicación</div>
+
+    </div>
+    <div class="user">
+      <canvas baseChart [datasets]="barChartData4" [labels]="barChartLabels4" [options]="barChartOptions" [legend]="barChartLegend"
+        [chartType]="barChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+      <div class="txt light-color">En esta gráfica se muestran cuantas entradas de historial tienen una determinada
+        cantidad de círculos,esto nos permite conocer el nivel de uso de la aplicación</div>
+    </div>
+    <div class="user">
+      <div class="txt bold">Círculo Mario</div>
+    </div>
+    <div class="user">
+      <div class="txt bold">Perfil: {{profile}}</div>
+      <div class="txt light-color">¿Cómo puedo perfilar una persona? </div>
+      <div class="txt light">- El perfilamiento de la persona lo hacemos a través de la cantidad de objetos valiosos
+        que tenga la misma, en un rango de menos de 10 objetos varios, será categorizado cómo persona clase media,
+        mientras que al tener más de 10 objetos de valor será categorizado cómo persona clase alta. No se consideran
+        personas de escasos recursos debido al tipo de servicio que se ofrece. </div>
+    </div>
+    <div class="user">
+      <canvas baseChart [data]="horaSalidaData" [labels]="horaSalidaLabels" [chartType]="doughnutChartType"></canvas>
+      <div class="txt light-color">¿A qué horas sale de la casa en promedio una persona clase alta? </div>
+      <div class="txt light">Esto permitirá completar el perfil de la persona para estudios de mercadeo, además de dar
+        una herramienta a la secretaría de movilidad para tomar medidas de tráfico en zonas donde se movilice una gran
+        cantidad de carros particulares, teniendo en cuenta que, al saber la hora promedio de salida de una persona
+        clase alta del hogar (que se supondrá tiene carro particular) se pueden tomar medidas preventivas. </div>
+    </div>
+    <div class="user">
+      <canvas baseChart [data]="horaEntradaData" [labels]="horaEntradaLabels" [chartType]="doughnutChartType"></canvas>
+      <div class="txt light-color">¿A qué horas vuelve a la casa en promedio una persona clase alta? </div>
+      <div class="txt light">Esto permitirá completar el perfil de la persona para estudios de mercadeo, además de
+        dar una herramienta a la secretaría de movilidad para tomar medidas de tráfico en zonas donde se movilice una
+        gran cantidad de carros particulares, teniendo en cuenta que, al saber la hora promedio de vuelta al hogar de
+        una persona de clase alta (que se supondrá tiene carro particular) se pueden tomar medidas preventivas. </div>
+    </div>
+    <div class="user">
+      <div class="txt bold">N/A</div>
+      <div class="txt light-color">¿A qué horas sale de la casa en promedio una persona clase media? </div>
+      <div class="txt light">Esto permitirá completar el perfil de la persona para estudios de mercadeo, además de
+        dar una herramienta a la secretaría de movilidad para tomar medidas en los sistemas de transporte públicos,
+        teniendo en cuenta que, al saber la hora promedio de salida de una persona clase media (que se supondrá usa el
+        sistema público de transporte) se pueden tomar medidas preventivas. </div>
+    </div>
+    <div class="user">
+      <div class="txt bold">N/A</div>
+      <div class="txt light-color">¿A qué horas vuelve de la casa en promedio una persona clase media? </div>
+      <div class="txt light">Esto permitirá completar el perfil de la persona para estudios de mercadeo, además de
+        dar una herramienta a la secretaría de movilidad para tomar medidas en los sistemas de transporte públicos,
+        teniendo en cuenta que, al saber la hora promedio de vuelta al hogar de una persona clase media (que se
+        supondrá usa el sistema público de transporte) se pueden tomar medidas preventivas. </div>
+    </div>
+    <div class="user">
+      <div class="txt bold">Tiempo: {{totalTimeOut | number : '1.2-2'}}hrs entre 10:00 (+/-1 hr) - 16:00 (+/-1 hr)</div>
+      <div class="txt light-color">¿Que período de tiempo promedio queda un hogar vacío? </div>
+      <div class="txt light">Al saber esta información se puede optimizar los turnos de los vigilantes para el cuidado
+        del hogar. </div>
+    </div>
+    <div class="user">
+      <canvas baseChart width="400" height="400" [datasets]="visitasData" [chartType]="lineChartType" [labels]="visitasLabels"></canvas>
+      <div class="txt light-color">¿En qué fechas un hogar recibe más visitas? </div>
+      <div class="txt light">De este modo podemos saber que días las personas se reunen más, las empresas que les
+        interese esta información podrán ofrecer promociones especiales para estos días (por ejemplo, en comida,
+        bebidas, etc..)</div>
+    </div>
+    <div class="user">
+      <div class="txt bold">Visitas promedio por día: {{totalVisits + 1 | number : '1.2-2'}}</div>
+      <div class="txt light-color">¿Cuántos visitantes tiene un hogar en promedio por día?</div>
+      <div class="txt light">De este modo podemos saber el tamaño de grupos de amigos/ familiares de un hogar,
+        aumentando el valor del perfil de la persona, ya que se le pueden ofrecer promociones o paquetes de eventos,
+        actividades, etc.... </div>
+    </div>
+    <div class="user">
+      <canvas baseChart [data]="visitDayData" [labels]="visitDayLabel" [chartType]="pieChartType"></canvas>
+      <div class="txt light-color">¿Qué días recibe un hogar más visitantes? </div>
+      <div class="txt light">Al conocer esta información podemos pensar en aumentar la seguridad estos dáis o vender
+        esta data a empresas que les interese crear promociones dependinedo el día de la semana para grupos de amigos /
+        familia</div>
+    </div>
+    <div class="user">
+      <canvas baseChart [data]="visitHourData" [labels]="visitHourLabel" [chartType]="pieChartType"></canvas>
+      <div class="txt light-color">¿Qué horas recibe un hogar más visitantes? </div>
+      <div class="txt light">Al conocer esta información podemos pensar en aumentar la seguridad estos dáis o vender
+        esta data a empresas que les interese crear promociones dependinedo el día de la semana para grupos de amigos /
+        familia</div>
+    </div>
+    <div class="user">
+      <canvas baseChart [data]="emergencyHourData" [labels]="emergencyHourLabel" [chartType]="doughnutChartType"></canvas>
+      <div class="txt light-color">¿A Qué horas hay más emergencias? </div>
+      <div class="txt light">- Esta información nos permitirá tomar medidas preventivas desde los sistemas de
+        emergencia.</div>
+    </div>
+    <div class="user">
+      <canvas baseChart [data]="emergencyDayData" [labels]="emergencyDayLabel" [chartType]="doughnutChartType"></canvas>
+      <div class="txt light-color">¿Qué días hay más emergencias? </div>
+      <div class="txt light">- Esta información nos permitirá tomar medidas preventivas desde los sistemas de
+        emergencia.</div>
+    </div>
+    <div class="user">
+        <canvas baseChart [data]="totalPop" [labels]="totalPopLabel" [chartType]="pieChartType"></canvas>
+        <div class="txt light-color">¿Qué porcentaje de hogares son clase alta?, ¿Qué porcentaje de hogares son clase media? </div>
+        <div class="txt light">Nos permitirá vender la base de datos a empresas que requieran este target de personas, realziar análisis poblacionales y conocer abitos y carácteristicas del nicho poblacional</div>
       </div>
       <div class="user">
-        <canvas baseChart
-                  [datasets]="barChartData2"
-                  [labels]="barChartLabels2"
-                  [options]="barChartOptions"
-                  [legend]="barChartLegend"
-                  [chartType]="barChartType"
-                  (chartHover)="chartHovered($event)"
-                  (chartClick)="chartClicked($event)"></canvas>
+          <canvas baseChart [data]="totalFam" [labels]="totalPopLabel" [chartType]="pieChartType"></canvas>
+          <div class="txt light-color">¿Promedio tamaño familia clase ata?, ¿Promedio tamaño familia clase media? </div>
+          <div class="txt light">Nos permitirá vender la base de datos a empresas que requieran este target de personas, realziar análisis poblacionales y conocer abitos y carácteristicas del nicho poblacional</div>
         </div>
         <div class="user">
-          <canvas baseChart
-                    [datasets]="barChartData3"
-                    [labels]="barChartLabels3"
-                    [options]="barChartOptions"
-                    [legend]="barChartLegend"
-                    [chartType]="barChartType"
-                    (chartHover)="chartHovered($event)"
-                    (chartClick)="chartClicked($event)"></canvas>
+            <canvas baseChart [data]="totalObj" [labels]="totalPopLabel" [chartType]="pieChartType"></canvas>
+            <div class="txt light-color">¿Promedio número de objetos familia clase media?, ¿Promedio número de objetos familia clase ata? </div>
+            <div class="txt light">Nos permitirá vender la base de datos a empresas que requieran este target de personas, realziar análisis poblacionales y conocer abitos y carácteristicas del nicho poblacional</div>
           </div>
-          <div class="user">
-            <canvas baseChart
-                      [datasets]="barChartData4"
-                      [labels]="barChartLabels4"
-                      [options]="barChartOptions"
-                      [legend]="barChartLegend"
-                      [chartType]="barChartType"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)"></canvas>
-            </div>
   </ng-container>
 </div>

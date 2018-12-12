@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, timeout, count } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
+
 
 export interface Metadata {
   barChartLabels: string[];
@@ -29,6 +30,7 @@ export interface Circle {
   objectID: string;
   ref: string;
   participants?: User[];
+  id?: string;
 }
 export interface CircleObj {
   leaderID: string;
@@ -59,7 +61,11 @@ export interface HouseHistory {
   action: number;
   name: string;
   date: Date;
+  id: string;
+  lastUpdated: Date;
   objectType: number;
+  userId: string;
+  userName: string;
 }
 @Component({
   selector: 'app-root',
@@ -68,6 +74,8 @@ export interface HouseHistory {
 })
 
 export class AppComponent {
+  profile: string;
+  historyMarioCircleRef: AngularFirestoreCollection<HouseHistory>;
   mdRef: AngularFirestoreDocument<Metadata>;
   md$: Observable<Metadata>;
   usersCollectionRef: AngularFirestoreCollection<User>;
@@ -90,17 +98,21 @@ export class AppComponent {
     scaleShowVerticalLines: false,
     responsive: true
   };
+
   public barChartLabels: string[] = [];
   public barChartLabels2: string[] = [];
   public barChartLabels3: string[] = [];
   public barChartLabels4: string[] = [];
   public barChartType = 'bar';
+  public doughnutChartType = 'doughnut';
+  public lineChartType = 'line';
+  public pieChartType = 'pie';
   public barChartLegend = true;
   public barChartData = [
-    { data: [], label: 'Círculos x Usuario' }
+    { data: [], label: 'Usuarios x Círculos' }
   ];
   public barChartData2 = [
-    { data: [], label: 'Usuarios x Círculo' }
+    { data: [], label: 'Círculos x Usuarios' }
   ];
   public barChartData3 = [
     { data: [], label: 'Objetos x Círculo' }
@@ -108,13 +120,114 @@ export class AppComponent {
   public barChartData4 = [
     { data: [], label: 'Historial x Círculo' }
   ];
+
+  public weekday = [];
+
+  // MARIO CÍRCULO
+  public horaSalidaData = [];
+  public horaSalidaLabels = [];
+
+  public horaEntradaData = [];
+  public horaEntradaLabels = [];
+
+  public totalTimeOut = 8;
+  public countTimeOut = 1;
+
+  public visitasData = [{data: [], label: 'Día Calendario'}];
+  public visitasLabels = [];
+
+  public totalVisits = 1;
+  public countVisits = 1;
+
+  public visitDayData = [];
+  public visitDayLabel = [];
+
+  public visitHourData = [];
+  public visitHourLabel = [];
+
+  public emergencyDayData = [];
+  public emergencyDayLabel = [];
+
+  public emergencyHourData = [];
+  public emergencyHourLabel = [];
+
+  public totalMedium = 0;
+  public totalHigh = 0;
+
+  public totalAvgHigh = 1;
+  public countAvgHigh = 1;
+
+  public totalAvgMed = 1;
+  public countAvgMed = 1;
+
+  public totaObjlAvgHigh = 1;
+  public countObjAvgHigh = 1;
+
+  public totalObjAvgMed = 1;
+  public countObjAvgMed = 1;
+
+  public totalPop = [];
+  public totalPopLabel = ['Clase Alta', 'Clase Media'];
+
+  public totalFam = [];
+
+  public totalObj = [];
   // events
+
+  // @ViewChild('gmap') gmapElement: any;
+  // map: google.maps.Map;
+
   constructor(private afs: AngularFirestore) {
+    // const mapProp = {
+    //   center: new google.maps.LatLng(18.5793, 73.8143),
+    //   zoom: 15,
+    //   mapTypeId: google.maps.MapTypeId.ROADMAP
+    // };
+    // this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
+
+    this.weekday[0] =  'Sunday';
+    this.weekday[1] = 'Monday';
+    this.weekday[2] = 'Tuesday';
+    this.weekday[3] = 'Wednesday';
+    this.weekday[4] = 'Thursday';
+    this.weekday[5] = 'Friday';
+    this.weekday[6] = 'Saturday';
     this.usersCollectionRef = this.afs.collection<User>('users');
     this.user$ = this.usersCollectionRef.valueChanges();
 
     this.circlesCollectionRef = this.afs.collection<Circle>('circles');
     this.circle$ = this.circlesCollectionRef.valueChanges();
+    this.circle$.subscribe(data => {
+      for (let i = 0; i < data.length; i++) {
+        const cc$ = data[i];
+        this.afs.collection('circles/' + cc$.id + '/objects').valueChanges().subscribe(obj => {
+          console.log(obj);
+          if (obj) {
+            if (obj.length > 9) {
+              this.totalHigh += 1;
+              if (cc$.participants) {
+              this.totalAvgHigh = ((this.totalAvgHigh * this.countAvgHigh) + cc$.participants.length) / (this.countAvgHigh + 1);
+              this.countAvgHigh += 1;
+              }
+              this.totaObjlAvgHigh = ((this.totaObjlAvgHigh * this.countObjAvgHigh) + obj.length) / (this.countObjAvgHigh + 1);
+              this.countObjAvgHigh += 1;
+            } else {
+              this.totalMedium += 1;
+              if (cc$.participants) {
+                this.totalAvgMed = ((this.totalAvgMed * this.countAvgMed) + cc$.participants.length) / (this.countAvgMed + 1);
+                this.countAvgMed += 1;
+                }
+                this.totalObjAvgMed = ((this.totalObjAvgMed * this.countObjAvgMed) + obj.length) / (this.countObjAvgMed + 1);
+                this.countObjAvgMed += 1;
+            }
+          }
+        });
+      }
+      this.totalPop = [this.totalHigh, this.totalMedium];
+      this.totalFam = [this.totalAvgHigh, this.totalAvgHigh];
+      this.totalObj = [this.totaObjlAvgHigh, this.totalObjAvgMed];
+      console.log('termino');
+    });
 
     this.mdRef = this.afs.doc<Metadata>('metadata/metadata');
     this.md$ = this.mdRef.valueChanges();
@@ -129,9 +242,168 @@ export class AppComponent {
       this.barChartLabels4 = data.barChartLabels4;
     });
 
-    // this.circlesXuser();
-    // this.usersXcircle();
+    this.afs.collection<HouseHistory>('circles/ZcLKwApuDHEgTeqIsvjj/objects').valueChanges().subscribe(data => {
+      if (data.length > 9) {
+        this.profile = 'Clase Alta';
+      } else {
+        this.profile = 'Clase Media';
+      }
+    });
+
+
+    this.historyMarioCircleRef = this.afs.collection<HouseHistory>('circles/ZcLKwApuDHEgTeqIsvjj/history', ref => {
+      return ref.orderBy('date');
+    });
+    this.historyMarioCircleRef.valueChanges().subscribe(cmh$ => {
+      let hist$;
+      let currentDate: Date;
+      let timeOut = -1;
+      let currentVisit = -1;
+      let currentVisitDay = -1;
+      for (let i = 0; i < cmh$.length; i++) {
+        hist$ = cmh$[i];
+        currentDate = new Date(null);
+        currentDate.setSeconds(hist$.date.seconds);
+        let flagData = false;
+        if (hist$.action === 0) {
+          const currentHour = currentDate.getHours() + '';
+          for (let j = 0; j < this.horaSalidaLabels.length; j++) {
+            if (currentHour === this.horaSalidaLabels[j]) {
+              this.horaSalidaData[j] = this.horaSalidaData[j] + 1;
+              flagData = true;
+              break;
+            }
+          }
+          if (!flagData) {
+            this.horaSalidaLabels.push(currentHour);
+            this.horaSalidaData.push(1);
+          }
+          if (timeOut === -1) {
+            timeOut = currentDate.getHours();
+          }
+        } else if (hist$.action === 1) {
+          const currentHour = currentDate.getHours() + '';
+          for (let j = 0; j < this.horaEntradaLabels.length; j++) {
+            if (currentHour === this.horaEntradaLabels[j]) {
+              this.horaEntradaData[j] = this.horaEntradaData[j] + 1;
+              flagData = true;
+              break;
+            }
+          }
+          if (!flagData) {
+            this.horaEntradaLabels.push(currentHour);
+            this.horaEntradaData.push(1);
+          }
+          if (timeOut !== -1) {
+            timeOut = Math.abs(timeOut - currentDate.getHours());
+            this.totalTimeOut = ((this.totalTimeOut * this.countTimeOut) + timeOut) / (this.countTimeOut + 1);
+            this.countTimeOut += 1;
+            timeOut = -1;
+          }
+        } else if (hist$.action === 2) {
+          const currentHourTime = currentDate.getHours() + ':00';
+          for (let j = 0; j < this.emergencyHourLabel.length; j++) {
+            if (currentHourTime === this.emergencyHourLabel[j]) {
+              this.emergencyHourData[j] = this.emergencyHourData[j] + 1;
+              flagData = true;
+              break;
+            }
+          }
+          if (!flagData) {
+            this.emergencyHourLabel.push(currentHourTime);
+            this.emergencyHourData.push(1);
+          }
+          let flagDay = false;
+          const currentDay = currentDate.getDay();
+          for (let j = 0; j < this.emergencyDayLabel.length; j++) {
+            if (this.weekday[currentDay] === this.emergencyDayLabel[j]) {
+              this.emergencyDayData[j] = this.emergencyDayData[j] + 1;
+              flagDay = true;
+              break;
+            }
+          }
+          if (!flagDay) {
+            this.emergencyDayLabel.push(this.weekday[currentDay]);
+            this.emergencyDayData.push(1);
+          }
+        } else if (hist$.action === 3) {
+          const currentHour = currentDate.getDate() + '/' + (currentDate.getMonth() + 1);
+          for (let j = 0; j < this.visitasLabels.length; j++) {
+            if (currentHour === this.visitasLabels[j]) {
+              this.visitasData[0].data[j] = this.visitasData[0].data[j] + 1;
+              flagData = true;
+              break;
+            }
+          }
+          if (!flagData) {
+            this.visitasLabels.push(currentHour);
+            this.visitasData[0].data.push(1);
+          }
+          if (currentVisit === -1) {
+            currentVisit = 1;
+            currentVisitDay = currentDate.getDate();
+          } else {
+            if (currentVisitDay === currentDate.getDate()) {
+              currentVisit++;
+            } else {
+                this.totalVisits = ((this.totalVisits * this.countVisits) + currentVisit) / (this.countVisits + 1);
+                this.countVisits += 1;
+                currentVisit = -1;
+            }
+          }
+          let flagDay = false;
+          const currentDay = currentDate.getDay();
+          for (let j = 0; j < this.visitDayLabel.length; j++) {
+            if (this.weekday[currentDay] === this.visitDayLabel[j]) {
+              this.visitDayData[j] = this.visitDayData[j] + 1;
+              flagDay = true;
+              break;
+            }
+          }
+          if (!flagDay) {
+            this.visitDayLabel.push(this.weekday[currentDay]);
+            this.visitDayData.push(1);
+          }
+          let flagHour = false;
+          const currentHourTime = currentDate.getHours() + ':00';
+          for (let j = 0; j < this.visitHourLabel.length; j++) {
+            if (currentHourTime === this.visitHourLabel[j]) {
+              this.visitHourData[j] = this.visitHourData[j] + 1;
+              flagHour = true;
+              break;
+            }
+          }
+          if (!flagHour) {
+            this.visitHourLabel.push(currentHourTime);
+            this.visitHourData.push(1);
+          }
+        }
+      }
+    });
   }
+  generateHistory() {
+    const cmRef = this.afs.collection<HouseHistory>('circles/ZcLKwApuDHEgTeqIsvjj/history');
+    let id$;
+    let date$;
+    for (let i = 0; i < 100; i++) {
+      id$ = this.afs.createId();
+      date$ = this.randomDate(new Date(2015, 0, 1), new Date());
+      cmRef.add({
+        action: 6,
+        date: date$,
+        id: id$,
+        lastUpdated: date$,
+        name: 'The object shshsy has entered your circle.',
+        objectType: 0,
+        userId: 'BzKz5LJ0cPn9WFwdHuKB',
+        userName: 'shshsy',
+      });
+    }
+
+  }
+  randomDate(start, end) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+}
   circlesXuser() {
     this.user$.subscribe(userList => {
       let currentUser;
