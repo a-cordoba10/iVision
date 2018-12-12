@@ -10,6 +10,12 @@ export interface Metadata {
   barChartLabels2: string[];
   barChartLabels3: string[];
   barChartLabels4: string[];
+  totalHigh: number;
+  totalMedium: number;
+  totalAvgHigh: number;
+  totalAvgMed: number;
+  totaObjlAvgHigh: number;
+  totalObjAvgMed: number;
   barChartData: { data: any[]; label: string; }[];
   barChartData2: { data: any[]; label: string; }[];
   barChartData3: { data: any[]; label: string; }[];
@@ -133,7 +139,7 @@ export class AppComponent {
   public totalTimeOut = 8;
   public countTimeOut = 1;
 
-  public visitasData = [{data: [], label: 'Día Calendario'}];
+  public visitasData = [{ data: [], label: 'Día Calendario' }];
   public visitasLabels = [];
 
   public totalVisits = 1;
@@ -185,7 +191,7 @@ export class AppComponent {
     // };
     // this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
 
-    this.weekday[0] =  'Sunday';
+    this.weekday[0] = 'Sunday';
     this.weekday[1] = 'Monday';
     this.weekday[2] = 'Tuesday';
     this.weekday[3] = 'Wednesday';
@@ -197,37 +203,46 @@ export class AppComponent {
 
     this.circlesCollectionRef = this.afs.collection<Circle>('circles');
     this.circle$ = this.circlesCollectionRef.valueChanges();
-    this.circle$.subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        const cc$ = data[i];
-        this.afs.collection('circles/' + cc$.id + '/objects').valueChanges().subscribe(obj => {
-          console.log(obj);
-          if (obj) {
-            if (obj.length > 9) {
-              this.totalHigh += 1;
-              if (cc$.participants) {
-              this.totalAvgHigh = ((this.totalAvgHigh * this.countAvgHigh) + cc$.participants.length) / (this.countAvgHigh + 1);
-              this.countAvgHigh += 1;
-              }
-              this.totaObjlAvgHigh = ((this.totaObjlAvgHigh * this.countObjAvgHigh) + obj.length) / (this.countObjAvgHigh + 1);
-              this.countObjAvgHigh += 1;
-            } else {
-              this.totalMedium += 1;
-              if (cc$.participants) {
-                this.totalAvgMed = ((this.totalAvgMed * this.countAvgMed) + cc$.participants.length) / (this.countAvgMed + 1);
-                this.countAvgMed += 1;
-                }
-                this.totalObjAvgMed = ((this.totalObjAvgMed * this.countObjAvgMed) + obj.length) / (this.countObjAvgMed + 1);
-                this.countObjAvgMed += 1;
-            }
-          }
-        });
-      }
-      this.totalPop = [this.totalHigh, this.totalMedium];
-      this.totalFam = [this.totalAvgHigh, this.totalAvgHigh];
-      this.totalObj = [this.totaObjlAvgHigh, this.totalObjAvgMed];
-      console.log('termino');
-    });
+    // Metadata nitialization
+    // this.circle$.subscribe(data => {
+    //   for (let i = 0; i < data.length; i++) {
+    //     const cc$ = data[i];
+    //     this.afs.collection('circles/' + cc$.id + '/objects').valueChanges().subscribe(obj => {
+    //       if (obj) {
+    //         if (obj.length > 9) {
+    //           this.totalHigh += 1;
+    //           if (cc$.participants) {
+    //           this.totalAvgHigh = ((this.totalAvgHigh * this.countAvgHigh) + cc$.participants.length) / (this.countAvgHigh + 1);
+    //           this.countAvgHigh += 1;
+    //           }
+    //           this.totaObjlAvgHigh = ((this.totaObjlAvgHigh * this.countObjAvgHigh) + obj.length) / (this.countObjAvgHigh + 1);
+    //           this.countObjAvgHigh += 1;
+    //         } else {
+    //           this.totalMedium += 1;
+    //           if (cc$.participants) {
+    //             this.totalAvgMed = ((this.totalAvgMed * this.countAvgMed) + cc$.participants.length) / (this.countAvgMed + 1);
+    //             this.countAvgMed += 1;
+    //             }
+    //             this.totalObjAvgMed = ((this.totalObjAvgMed * this.countObjAvgMed) + obj.length) / (this.countObjAvgMed + 1);
+    //             this.countObjAvgMed += 1;
+    //         }
+    //       }
+    //       console.log(this.totalHigh);
+    //       console.log(this.totalMedium);
+    //       console.log(this.totalAvgHigh);
+    //       console.log(this.totalAvgMed);
+    //       console.log(this.totaObjlAvgHigh);
+    //       console.log(this.totalObjAvgMed);
+    //     });
+    //   }
+    //   this.totalPop.push(this.totalHigh);
+    //   this.totalPop.push(this.totalMedium);
+    //   this.totalFam.push(this.totalAvgHigh);
+    //   this.totalFam.push(this.totalAvgMed);
+    //   this.totalObj.push(this.totaObjlAvgHigh);
+    //   this.totalObj.push(this.totalObjAvgMed);
+    //   console.log('termino');
+    // });
 
     this.mdRef = this.afs.doc<Metadata>('metadata/metadata');
     this.md$ = this.mdRef.valueChanges();
@@ -240,6 +255,18 @@ export class AppComponent {
       this.barChartLabels2 = data.barChartLabels2;
       this.barChartLabels3 = data.barChartLabels3;
       this.barChartLabels4 = data.barChartLabels4;
+      this.totalHigh = data.totalHigh;
+      this.totalMedium = data.totalMedium;
+      this.totalAvgHigh = data.totalAvgHigh;
+      this.totalAvgMed = data.totalAvgMed;
+      this.totaObjlAvgHigh = data.totaObjlAvgHigh;
+      this.totalObjAvgMed = data.totalObjAvgMed;
+      this.totalPop.push(this.totalHigh);
+      this.totalPop.push(this.totalMedium);
+      this.totalFam.push(this.totalAvgHigh);
+      this.totalFam.push(this.totalAvgMed);
+      this.totalObj.push(this.totaObjlAvgHigh);
+      this.totalObj.push(this.totalObjAvgMed);
     });
 
     this.afs.collection<HouseHistory>('circles/ZcLKwApuDHEgTeqIsvjj/objects').valueChanges().subscribe(data => {
@@ -346,9 +373,9 @@ export class AppComponent {
             if (currentVisitDay === currentDate.getDate()) {
               currentVisit++;
             } else {
-                this.totalVisits = ((this.totalVisits * this.countVisits) + currentVisit) / (this.countVisits + 1);
-                this.countVisits += 1;
-                currentVisit = -1;
+              this.totalVisits = ((this.totalVisits * this.countVisits) + currentVisit) / (this.countVisits + 1);
+              this.countVisits += 1;
+              currentVisit = -1;
             }
           }
           let flagDay = false;
@@ -381,6 +408,18 @@ export class AppComponent {
       }
     });
   }
+  pushMeta() {
+    const metadataRef = this.afs.doc('metadata/metadata');
+    const mdObject = {
+      'totalHigh': this.totalHigh,
+      'totalMedium': this.totalMedium,
+      'totalAvgHigh': this.totalAvgHigh,
+      'totalAvgMed': this.totalAvgMed,
+      'totaObjlAvgHigh': this.totaObjlAvgHigh,
+      'totalObjAvgMed': this.totalObjAvgMed,
+    };
+    metadataRef.update(mdObject);
+  }
   generateHistory() {
     const cmRef = this.afs.collection<HouseHistory>('circles/ZcLKwApuDHEgTeqIsvjj/history');
     let id$;
@@ -403,7 +442,7 @@ export class AppComponent {
   }
   randomDate(start, end) {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-}
+  }
   circlesXuser() {
     this.user$.subscribe(userList => {
       let currentUser;
@@ -500,16 +539,16 @@ export class AppComponent {
   saveData() {
     const metadataRef = this.afs.doc('metadata/metadata');
     const mdObject = {
-      'barChartLabels' : this.barChartLabels,
-      'barChartLabels2' : this.barChartLabels2,
-      'barChartLabels3' : this.barChartLabels3,
-      'barChartLabels4' : this.barChartLabels4,
-      'barChartData' : this.barChartData,
-      'barChartData2' : this.barChartData2,
-      'barChartData3' : this.barChartData3,
-      'barChartData4' : this.barChartData4,
+      'barChartLabels': this.barChartLabels,
+      'barChartLabels2': this.barChartLabels2,
+      'barChartLabels3': this.barChartLabels3,
+      'barChartLabels4': this.barChartLabels4,
+      'barChartData': this.barChartData,
+      'barChartData2': this.barChartData2,
+      'barChartData3': this.barChartData3,
+      'barChartData4': this.barChartData4,
     };
-    metadataRef.set(mdObject, {merge: true});
+    metadataRef.set(mdObject, { merge: true });
   }
   openCircle(id) {
     this.circleTab = 0;
